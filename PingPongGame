@@ -1,0 +1,263 @@
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace IgricaPingPong
+{
+    class Program
+    {  
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------- GLOBALNE PROMENLJIVE KOJE KORISTIMO---------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      
+       static int firstPlayerPadSize = int.Parse(Console.ReadLine());
+       static int secondPlayerPadSize = 4;
+       static int ballPositionX = 0;
+       static int ballPositionY = 0;
+       static bool ballDirectionUp = true;
+       static bool ballDirectionRight= false;
+       static int firstPlayerPosition = 0;
+       static int secondPlayerPosition = 0;
+       static int firsPlayerResult = 0;
+       static int secondPlayerResult = 0;
+       static Random randomGenerator = new Random();
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------- FUNKCIJE ILI METODE KOJE KORISTIMO--------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+        static void RemuveScrollBar()
+        {
+            Console.BufferWidth = Console.WindowWidth;
+            Console.BufferHeight = Console.WindowHeight;
+        }
+
+        static void DrowFirstPlayer()
+        {
+            for (int y = firstPlayerPosition; y <firstPlayerPosition + firstPlayerPadSize ; y++)
+            {
+                PrintAtPosition(0, y, '|');
+                PrintAtPosition(1, y, '|');
+            }
+        }
+
+         static void PrintAtPosition(int x, int y, char symbol)
+        {
+
+            Console.SetCursorPosition(x , y);
+            Console.Write(symbol);
+
+        }
+
+        static void DrowSeconPlayer()
+        {
+            for (int y = secondPlayerPosition; y < secondPlayerPosition + secondPlayerPadSize; y++)
+            {
+                PrintAtPosition(Console.WindowWidth - 1 , y , '|');
+                PrintAtPosition(Console.WindowWidth - 2, y , '|');
+            }
+        }
+        static void SetInitialPosition()
+        {
+            firstPlayerPosition = Console.WindowHeight / 2 - firstPlayerPadSize / 2;
+            secondPlayerPosition = Console.WindowHeight / 2 - secondPlayerPadSize / 2;
+            SetBallAtTheMiddleOfTheGameField();
+        }
+        static void SetBallAtTheMiddleOfTheGameField()
+        {
+            ballPositionX = Console.WindowWidth / 2;
+            ballPositionY = Console.WindowHeight / 2;
+        }
+         static void DrowBall()
+        {
+            PrintAtPosition(ballPositionX, ballPositionY, '@');
+        }
+         static void PrintResult()
+         {
+             Console.SetCursorPosition(Console.WindowWidth / 2 - 1, 0);
+             Console.Write("{0}-{1}", firsPlayerResult, secondPlayerResult);
+         }
+          static void MoveFirstPlayerDown()
+         {
+             //TODO:move first player down
+              if ( firstPlayerPosition < Console.WindowHeight - firstPlayerPadSize)
+              {
+                   firstPlayerPosition++;
+              }
+         }
+
+          static void MoveFirstPlayerUp()
+         {
+             // move first player up
+             if (firstPlayerPosition > 0)
+             {
+                 firstPlayerPosition--;
+             }
+         }
+          static void MoveSecondPlayerDown()
+          {
+              //move first player down
+              if (secondPlayerPosition < Console.WindowHeight - secondPlayerPadSize)
+              {
+                  secondPlayerPosition++;
+              }
+          }
+
+          static void MoveSecondPlayerUp()
+          {
+              // move first player up
+              if (secondPlayerPosition > 0)
+              {
+                  secondPlayerPosition--;
+              }
+          }
+           static void SecondPlayerAIMove()
+          {
+             int randumNumber =  randomGenerator.Next(1, 101);
+             //  if (randumNumber == 0)
+             //  {
+             //      MoveSecondPlayerUp();
+             //  }
+             //  if (randumNumber == 1)
+             //  {
+             //      MoveSecondPlayerDown();
+             //  }
+               if ( randumNumber <= 75)
+               {
+              if (ballDirectionUp == true)
+              {
+                  MoveSecondPlayerUp();
+
+              }
+              else
+              {
+                  MoveSecondPlayerDown();
+
+              }
+               }
+          }
+            static void MoveBall()
+           {
+                if (ballPositionY == 0)
+                {
+                    ballDirectionUp = false;
+                }
+                if (ballPositionY == Console.WindowHeight - 1)
+                {
+                    ballDirectionUp = true;
+                }
+                if (ballPositionX == Console.WindowWidth - 1)
+                {
+                    // drugi igrac gubi
+                    SetBallAtTheMiddleOfTheGameField();
+                    ballDirectionUp = true;
+                    ballDirectionRight = false;
+                    Console.SetCursorPosition(Console.WindowWidth / 2, Console.WindowHeight / 2);
+                    Console.WriteLine("Prvi igrac je pobedio");
+                    firsPlayerResult++;
+                    Console.ReadKey();
+                }
+                if (ballPositionX == 0)
+                {
+                    //prvi igrac gubi
+                    ballDirectionUp = true;
+                    ballDirectionRight = true;
+                    SetBallAtTheMiddleOfTheGameField();
+                    Console.SetCursorPosition(Console.WindowWidth / 2, Console.WindowHeight / 2);
+                    Console.WriteLine("Drugi igrac je pobedio!");
+                    secondPlayerResult++;
+                    Console.ReadKey();
+
+                }
+                if (ballPositionX < 3)
+                {
+                    if (ballPositionY >= firstPlayerPosition
+                        && ballPositionY < firstPlayerPosition + firstPlayerPadSize
+                        )
+                    {
+                        ballDirectionRight = true;
+                    }
+                }
+                if (ballPositionX >= Console.WindowWidth - 3 - 1)
+                {
+                    if (ballPositionY >=secondPlayerPosition 
+                        && ballPositionY < secondPlayerPosition + secondPlayerPadSize
+                        )
+                    {
+                        ballDirectionRight = false;
+                    }
+
+                }
+
+                //Proverava dali lopta ide gore
+               if (ballDirectionUp)
+               {
+                   ballPositionY--;
+               }
+               else
+               {
+                   ballPositionY++;
+               }
+                //Proverava dali lopta ide dole
+               if (ballDirectionRight)
+               {
+                   ballPositionX++;
+               }
+               else
+               {
+                   ballPositionX--;
+               }
+               
+           }
+            
+//-----------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------GLAVNA METODA ODAKLE POCINJA KOD------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------
+            static void Main(string[] args)
+            {
+
+                RemuveScrollBar();
+                SetInitialPosition();
+                while (true)
+                {    //Start
+
+
+                    //Move first player
+                    if (Console.KeyAvailable)
+                    {
+                        ConsoleKeyInfo keyInfo = Console.ReadKey();
+                        if (keyInfo.Key == ConsoleKey.W)
+                        {
+                            MoveFirstPlayerUp();
+                        }
+                        if (keyInfo.Key == ConsoleKey.S)
+                        {
+                            MoveFirstPlayerDown();
+                        }
+                    }
+                    //Move second player
+                    SecondPlayerAIMove();
+                    //Move ball
+                    MoveBall();
+                    //REDROW ALL
+                    //-clear all
+                    Console.Clear();
+                    //-Drow First player-Metod koji crta prvog igraca
+                    DrowFirstPlayer();
+                    //-Drow Second player
+                    DrowSeconPlayer();
+                    //-draw ball
+                    DrowBall();
+                    //-print result
+                    PrintResult();
+
+                    Thread.Sleep(90);
+                }
+
+
+            }
+       
+    }
+}
